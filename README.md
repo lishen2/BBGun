@@ -13,9 +13,9 @@ Hareware resources
 
 Progress
 --------
-20150427: First PCB design.
-20150503: Make first test board.
-20150505: LED driver code and buzzer driver code finish.
+20150427: First PCB design.     
+20150503: Make first test board.  
+20150505: LED driver code and buzzer driver code finish.  
 
 BBGun
 =============
@@ -31,9 +31,9 @@ BBGun是一个用于娱乐目的的红外射击系统(真人CS)。Milestag项目
 
 当前进度
 --------
-20150427: 完成PCB设计
-20150503: 完成第一版PCB的制作
-20150505: 完成LED驱动、蜂鸣器驱动
+20150427: 完成PCB设计   
+20150503: 完成第一版PCB的制作   
+20150505: 完成LED驱动、蜂鸣器驱动  
 
 
 
