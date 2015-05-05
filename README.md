@@ -8,8 +8,8 @@ Hareware resources
 * one TSAL6100 IR emitter, two HS0038B IR reciver.
 * one RJ9 socket used to connect external reciver(not implemented yet).
 * one three key dil switch, used to set group.
-* one buzzer controled by PWM pin.
-* two push butten.
+* one buzzer controlled by PWM pin.
+* two push buttons.
 
 Progress
 --------
@@ -23,8 +23,8 @@ BBGun是一个用于娱乐目的的红外射击系统(真人CS)。Milestag项目
 
 硬件资源
 -------
-* 一个TSAL6100发射，两个HS0038B接收，
-* 一个RJ9接口用于连接外置外置接收器（暂未实现）
+* 一个TSAL6100发射管，两个HS0038B接收管
+* 一个RJ9接口用于连接外置接收器（暂未实现）
 * 一个三键拨码开关，用于设置分组
 * 一个PWM引脚控制的蜂鸣器
 * 两个按键
@@ -32,7 +32,7 @@ BBGun是一个用于娱乐目的的红外射击系统(真人CS)。Milestag项目
 当前进度
 --------
 20150427: 完成PCB设计   
-20150503: 完成第一版PCB的制作   
+20150503: 完成第一块PCB的制作   
 20150505: 完成LED驱动、蜂鸣器驱动  
 
 
