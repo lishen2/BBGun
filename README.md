@@ -1,7 +1,7 @@
 BBGun
 =============
 BBGUN is an infrared shooting system used for entertainment purposes. The project Milestag gave us a lot of inspiration.
-![image](https://raw.github.com/lishen2/BBGun/master/pictures/IMG2231.jpg)
+![image](https://raw.githubusercontent.com/lishen2/BBGun/master/pictures/IMG_2231.JPG)
 
 Hareware resources
 -------
