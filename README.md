@@ -18,6 +18,10 @@ Progress
 20150505: LED driver code and buzzer driver code finish.  
 20150510: Finish all drivers except IR system.
 
+Developing blog
+--------
+http://lsgeek.blogspot.com
+
 BBGun
 =============
 BBGun是一个用于娱乐目的的红外射击系统(真人CS)。Milestag项目给了我们很多启发。
@@ -37,5 +41,7 @@ BBGun是一个用于娱乐目的的红外射击系统(真人CS)。Milestag项目
 20150505: 完成LED驱动、蜂鸣器驱动  
 20150510: 完成除IR系统外的所有驱动
 
-
+开发博客
+--------
+http://blog.sina.com.cn/lgeek
 
