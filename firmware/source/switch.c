@@ -44,17 +44,17 @@ unsigned char switch_getvalue(void)
 
 	ret = GPIO_ReadInputDataBit(SWITCH_GPIO_PORT, SWITCH_GPIO_PIN1);
 	if (Bit_SET == ret){
-		val	&= 1 << 0;
+		val	|= 1 << 0;
 	}
 
 	ret = GPIO_ReadInputDataBit(SWITCH_GPIO_PORT, SWITCH_GPIO_PIN2);
 	if (Bit_SET == ret){
-		val	&= 1 << 1;
+		val	|= 1 << 1;
 	}
 	
 	ret = GPIO_ReadInputDataBit(SWITCH_GPIO_PORT, SWITCH_GPIO_PIN3);
 	if (Bit_SET == ret){
-		val	&= 1 << 2;
+		val	|= 1 << 2;
 	}		
 
 	_deinit_pin();
