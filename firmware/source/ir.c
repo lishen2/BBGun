@@ -4,8 +4,7 @@
 #include "ir.h"
 
 #define IR_FIRE_USART   USART3
-#define IR_RECV1_UASRT  USART2 
-#define IR_RECV2_UASRT  USART3
+#define IR_RECV_UASRT   USART2 
 
 //38KHZ PWM pin
 #define IR_PWM_PIN         GPIO_Pin_6
@@ -13,10 +12,6 @@
 #define IR_PWM_PORT_CLOCK  RCC_APB2Periph_GPIOA
 #define IR_PWM_TIMER       TIM3
 #define IR_PWM_TIMER_CLOCK RCC_APB1Periph_TIM3
-
-#define IR_PROTOCOL_MARK 0x7A
-
-static int g_last_ts = 0;
 
 static void _config_pwm(void)
 {
@@ -89,27 +84,75 @@ void ir_init(void)
 	_gpio_init();
 	_config_pwm();
 
-	//keep IR diode from continuing emmit, disable pin here, enable when need
-	usartio_disable_usart3_tx();
-
+    g_ir_state = IR_STATE_START;
+    
 	return;
 }
 
+enum{
+    IR_STATE_START,
+    IR_STATE_SHOT,
+    IR_STATE_MESSAGE,
+    IR_STATE_FINISH,
+};
+
+static int g_ir_state;
+static unsigned char g_buf[128];
+static unsigned char g_bufpos;
+/* 
+* handle received message
+*/
+void ir_handle_msg(void)
+{
+    uint8_t data;
+    int ret;
+    
+    while(1){
+        ret = usartio_recvchar(IR_RECV_UASRT, &data);
+        if (ERR_OK != ret){
+            break;
+        }
+
+        switch(g_ir_state)
+        {
+        case IR_STATE_START:
+        case IR_STATE_FINISH:    
+            g_buf[[0] = data;
+            g_bufpos = 1;
+            if (0 == 0x80 & data){
+                g_ir_state = IR_STATE_SHOT;
+            } else {
+                g_ir_state = IR_STATE_MESSAGE;
+            }
+            break;
+        case IR_STATE_SHOT:
+            g_buf[g_bufpos++] == data;
+            if (2 == g_bufpos){
+                
+            }
+            break;
+        }
+    
+    }
+
+    return;
+}
+
+/*
 void ir_fire(unsigned char team, unsigned char persion, unsigned char damage, unsigned char firetime)
 {
-	if ((g_jiffies - g_last_ts)*(1000/HZ) < firetime){
+    int delay_jif;
+
+    delay_jif = firetime/(1000/HZ);
+
+	if (time_after(g_last_ts + delay_jif, g_jiffies)){
 		return;
 	}
-
-	usartio_enable_usart3_tx();
-	delay_ms(20);
-
+    
 	usartio_sendchar_polling(IR_FIRE_USART, IR_PROTOCOL_MARK);
 	usartio_sendchar_polling(IR_FIRE_USART, team);
 	usartio_sendchar_polling(IR_FIRE_USART, damage);
 	g_last_ts = firetime;
-	
-	usartio_disable_usart3_tx();
 
 	return;	
 }
@@ -143,4 +186,5 @@ int ir_ishit(unsigned char *team, unsigned char *persion, unsigned char *damage)
 
 	return ret;
 }
+*/
 

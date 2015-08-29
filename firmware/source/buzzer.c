@@ -37,7 +37,7 @@ static void _config_pwm(uint16_t freq)
 	/* Time base configuration */
 	TIM_TimeBaseStructure.TIM_Period = period;
 	TIM_TimeBaseStructure.TIM_Prescaler = prescaler;
-	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;	
 	TIM_TimeBaseInit(BUZ_TIMER, &TIM_TimeBaseStructure);
 	

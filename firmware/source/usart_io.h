@@ -26,10 +26,5 @@ void usartio_init_usart1(void);
 void usartio_init_usart2(void);
 void usartio_init_usart3(void);
 
-/* set usart3 tx to in floating */
-void usartio_disable_usart3_tx(void);
-/* set usart3 tx to AF_PP */
-void usartio_enable_usart3_tx(void);
-
 #endif
 

@@ -4,7 +4,10 @@
 enum{
 	BUTTON_NOKEY,
 	BUTTON_FIRE,
-	BUTTON_FUNC,
+	BUTTON_CANCEL,
+	BUTTON_ENTER,
+	BUTTON_UP,
+	BUTTON_DOWN,
 };
 
 void button_init(void);

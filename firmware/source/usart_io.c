@@ -35,7 +35,7 @@
 
 /* USART1 send and receive buffer size */
 #define USARTIO_U1_READBUF_SIZE  64 
-#define USARTIO_U1_WRITEBUF_SIZE 1024 
+#define USARTIO_U1_WRITEBUF_SIZE 1024
 
 /* USART2 is receive only, USART3 use polling mode to send, so they both not use send buffer */
 #define USARTIO_U2_READBUF_SIZE  256 
@@ -96,8 +96,7 @@ int usartio_sendchar_polling(void* port, unsigned char ch)
 	if (USART3 == port){
 	    USART_SendData(port, ch);
 	    while(USART_GetFlagStatus(port, USART_FLAG_TXE) == RESET);
-    } 
-	else {
+    } else {
         return ERR_FAILED;
     }
 
@@ -174,7 +173,6 @@ void usartio_init_usart1(void)
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
     USART_Init(USART1, &USART_InitStructure);
 
     /* enable interrupt */
@@ -208,18 +206,24 @@ void usartio_init_usart2(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(USARTIO_USART2_GPIO, &GPIO_InitStructure);
 
-    USART_InitStructure.USART_BaudRate = 300;                   
+    USART_InitStructure.USART_BaudRate = 300; //根据所选接收管的限制，计算得出最大值为712
     USART_InitStructure.USART_WordLength = USART_WordLength_8b; 
     USART_InitStructure.USART_StopBits = USART_StopBits_1;      
     USART_InitStructure.USART_Parity = USART_Parity_No;         
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Rx;
-
     USART_Init(USART2, &USART_InitStructure);
 
     USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-
     USART_Cmd(USART2, ENABLE);
+
+    /* Set the USARTy prescaler */
+    USART_SetPrescaler(USART2, 0x1);
+    /* Configure the USARTy IrDA mode */
+    USART_IrDAConfig(USART2, USART_IrDAMode_Normal);
+    
+    /* Enable the USARTy IrDA mode */
+    USART_IrDACmd(USART2, ENABLE);
 
     return;
 }
@@ -251,22 +255,28 @@ void usartio_init_usart3(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Init(USARTIO_USART3_GPIO, &GPIO_InitStructure);
 
-    USART_InitStructure.USART_BaudRate = 300;
+    USART_InitStructure.USART_BaudRate = 300; //根据所选接收管的限制，计算得出最大值为712
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
     USART_InitStructure.USART_StopBits = USART_StopBits_1;     
     USART_InitStructure.USART_Parity = USART_Parity_No;        
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
     USART_Init(USART3, &USART_InitStructure);
 
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-
     USART_Cmd(USART3, ENABLE);
+
+    /* Set the USARTy prescaler */
+    USART_SetPrescaler(USART3, 0x1);
+    /* Configure the USARTy IrDA mode */
+    USART_IrDAConfig(USART3, USART_IrDAMode_Normal);
+    
+    /* Enable the USARTy IrDA mode */
+    USART_IrDACmd(USART3, ENABLE);
 
     return;
 }
-
+/*
 void usartio_disable_usart3_tx(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -290,7 +300,7 @@ void usartio_enable_usart3_tx(void)
 
 	return;
 }
-
+*/
 /**
   * @brief  This function handles USART1 global interrupt request.
   * @param  None
