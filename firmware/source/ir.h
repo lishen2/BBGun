@@ -19,13 +19,13 @@
 #define IR_BYTE2_COMMAND_START_GAME        0x02	//Start Game
 #define IR_BYTE2_COMMAND_RESTORE_DEFAULT   0x03	//Restore Defaults
 #define IR_BYTE2_COMMAND_RESPAWN           0x04	//Respawn
-#define IR_BYTE2_COMMAND_NEW_GAME          0x05	//New Game (Immediate)
+#define IR_BYTE2_COMMAND_NEW_GAME_IMMED    0x05	//New Game (Immediate)
 #define IR_BYTE2_COMMAND_FULL_AMMO         0x06	//Full Ammo
 #define IR_BYTE2_COMMAND_END_GAME          0x07	//End Game
 #define IR_BYTE2_COMMAND_RESET_CLOCK       0x08	//Reset Clock
 #define IR_BYTE2_COMMAND_INITIALIZE_PLAYER 0x0A	//Initialize Player
 #define IR_BYTE2_COMMAND_EXPLODE_PLAYER    0x0B	//Explode Player
-#define IR_BYTE2_COMMAND_NEW_GAME          0x0C	//New Game (Ready)
+#define IR_BYTE2_COMMAND_NEW_GAME_READY    0x0C	//New Game (Ready)
 #define IR_BYTE2_COMMAND_FULL_HEALTH       0x0D	//Full Health
 #define IR_BYTE2_COMMAND_FULL_ARMOR        0X0F	//Full Armor
 #define IR_BYTE2_COMMAND_CLARE_SCORES      0x14	//Clear Scores

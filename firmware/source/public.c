@@ -27,17 +27,6 @@ static inline void PWR_PrepareSleep(u32 SysCtrl_Set)
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP;        // Clear SLEEPDEEP bit
 }
 
-//为了准确性，此函数需至少延时几百个纳秒，延时越长越精确
-//但是延时时间最长不得长于 0x7FFFFFFF * PUBLIC_NS_PRE_TICK = 40802189293ns = 40s
-void delay_ns(u32 ns)
-{
-    u32 period;
-
-    period = ns / PUBLIC_DELAY_NS_PRE_TIMER_TICK;
-
-    return;
-}
-
 void delay_ms(int ms)
 {
 	ms = ms/(1000/HZ) + g_jiffies;
@@ -46,24 +35,6 @@ void delay_ms(int ms)
 	while(time_after(ms, g_jiffies)){
 		__WFI();
 	}
-
-	return;
-}
-
-static _init_delay_timer(void)
-{
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    u16 prescaler;
-
-    RCC_APB1PeriphClockCmd(PUBLIC_DELAY_TIMER_RCC, ENABLE);
-    
-    /* clock at 24 MHz */
-	prescaler = (u16) (SystemCoreClock / PUBLIC_DELAY_TIMER_FEQ) - 1;
-    TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
-    TIM_TimeBaseStructure.TIM_Prescaler = prescaler; 
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; 
-    TIM_TimeBaseInit(PUBLIC_DELAY_TIMER, &TIM_TimeBaseStructure);  
 
     return;
 }

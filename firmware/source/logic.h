@@ -14,8 +14,8 @@ struct logic_clone_data
     uint8_t led_timeout;
     uint8_t sounds;
     uint8_t overheat_limit;
-    uint8_t __r2;
     uint8_t __r3;
+    uint8_t __r4;
     uint8_t damage;
     uint8_t clip_size;
     uint8_t clips;
@@ -26,7 +26,7 @@ struct logic_clone_data
     uint8_t ir_power;
     uint8_t ir_range[2];
     uint8_t health;
-    uint8_t __r4;
+    uint8_t __r5;
     uint8_t respawn_delay;
     uint8_t armor[3];
     uint8_t hit_delay;
@@ -34,7 +34,7 @@ struct logic_clone_data
     uint8_t death_delay;
     uint8_t time_limit;
     uint8_t respawns;
-    uint8_t __r5;
+    uint8_t __r6;
     uint8_t checksum;
 };
 

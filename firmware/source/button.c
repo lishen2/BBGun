@@ -56,7 +56,7 @@ int button_get(void)
 		delay_ms(20);
 		hit = GPIO_ReadInputDataBit(BUTTON_FUNC_PORT, BUTTON_FUNC_PIN);
 		if (Bit_RESET == hit){
-			 key = BUTTON_FUNC;
+			 key = BUTTON_RELOAD;
 		}
 	}
 

@@ -1,7 +1,9 @@
+#include <string.h>
 #include "stm32f10x.h"
 #include "public.h"
 #include "usart_io.h"
 #include "ir.h"
+#include "logic.h"
 
 #define IR_FIRE_USART   USART3
 #define IR_RECV_UASRT   USART2 
@@ -101,14 +103,14 @@ static void _ir_handle_system_data(void)
     switch(g_buf[1])
     {
     case 0x01:
-        for (i = 0; i < ; ++i){
+        for (i = 0; i < sizeof(struct logic_clone_data); ++i){
             ret = usartio_recvchar(IR_RECV_UASRT, &data, IR_SYSTEM_DATA_RECV_TIMEOUT);
             if (ERR_OK != ret){
                 break;
             }
         }
         if (sizeof(struct logic_clone_data) == i){
-            logic_clone_data(g_buf + 3);
+            logic_clone_data((struct logic_clone_data*)(g_buf + 3));
         }
         break;
     case 0x03:
@@ -143,7 +145,7 @@ void ir_handle_msg(void)
         switch(g_ir_state)
         {
         case IR_STATE_START:  
-            if (0 == 0x80 & data) {
+            if (0 == (0x80 & data)) {
                 g_ir_state = IR_STATE_SHOT;
             } else {
                 g_ir_state = IR_STATE_MESSAGE;
@@ -167,14 +169,14 @@ void ir_handle_msg(void)
                 case 0x80:
                     logic_add_health(g_buf[1]);
                     break;
-                case 0x81;
+                case 0x81:
                     logic_add_rounds(g_buf[1]);
                     break;
                 case 0x83:
                     logic_handle_command(g_buf[1]);
                     break;
                 case 0x87:
-                    _ir_handle_system_data(void);
+                    _ir_handle_system_data();
                     break;
                 case 0x8A:
                     logic_clips_pickup(g_buf[1]);
@@ -228,12 +230,12 @@ void ir_send_message(uint8_t byte1, uint8_t byte2, uint8_t *extra, uint8_t ext_l
 {
     int i;
     
-    usartio_sendchar_polling(byte1);
-    usartio_sendchar_polling(byte2);
-    usartio_sendchar_polling(0xE8);
+    usartio_sendchar_polling(IR_FIRE_USART, byte1);
+    usartio_sendchar_polling(IR_FIRE_USART, byte2);
+    usartio_sendchar_polling(IR_FIRE_USART, 0xE8);
     
     for (i = 0; i < ext_len; ++i){
-        usartio_sendchar_polling(extra[i]);
+        usartio_sendchar_polling(IR_FIRE_USART, extra[i]);
     }
 
     return;
