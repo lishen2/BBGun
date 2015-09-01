@@ -5,6 +5,40 @@
 * IR System
 ***********************************************/
 
+#define IR_BYTE1_ADD_HEALTH    0x80
+#define IR_BYTE1_ADD_ROUNDS    0x81
+#define IR_BYTE1_COMMAND       0x83
+#define IR_BYTE1_SYSTEM_DATA   0x87
+#define IR_BYTE1_CLIPS_PICKUP  0x8A
+#define IR_BYTE1_HEALTH_PICKUP 0x8B
+#define IR_BYTE1_FLAG_PICKUP   0x8C
+
+//availably when byte1 is IR_BYTE1_COMMAND
+#define IR_BYTE2_COMMAND_ADMIN_KILL        0x00	//Admin Kill
+#define IR_BYTE2_COMMAND_PAUSE             0x01	//Pause/Unpause
+#define IR_BYTE2_COMMAND_START_GAME        0x02	//Start Game
+#define IR_BYTE2_COMMAND_RESTORE_DEFAULT   0x03	//Restore Defaults
+#define IR_BYTE2_COMMAND_RESPAWN           0x04	//Respawn
+#define IR_BYTE2_COMMAND_NEW_GAME          0x05	//New Game (Immediate)
+#define IR_BYTE2_COMMAND_FULL_AMMO         0x06	//Full Ammo
+#define IR_BYTE2_COMMAND_END_GAME          0x07	//End Game
+#define IR_BYTE2_COMMAND_RESET_CLOCK       0x08	//Reset Clock
+#define IR_BYTE2_COMMAND_INITIALIZE_PLAYER 0x0A	//Initialize Player
+#define IR_BYTE2_COMMAND_EXPLODE_PLAYER    0x0B	//Explode Player
+#define IR_BYTE2_COMMAND_NEW_GAME          0x0C	//New Game (Ready)
+#define IR_BYTE2_COMMAND_FULL_HEALTH       0x0D	//Full Health
+#define IR_BYTE2_COMMAND_FULL_ARMOR        0X0F	//Full Armor
+#define IR_BYTE2_COMMAND_CLARE_SCORES      0x14	//Clear Scores
+#define IR_BYTE2_COMMAND_TEST_SENSORS      0x15	//Test Sensors
+#define IR_BYTE2_COMMAND_STUN_PLAYER       0x16	//Stun Player
+#define IR_BYTE2_COMMAND_DISARM_PLAYER     0x17	//Disarm Player   
+
+//availably when byte1 is IR_BYTE1_SYSTEM_DATA
+#define IR_BYTE2_SYSTEM_CLONE_DATA  0x01
+#define IR_BYTE2_SYSTEM_SCORE_DATA1 0x03
+#define IR_BYTE2_SYSTEM_SCORE_DATA2 0x04
+#define IR_BYTE2_SYSTEM_SCORE_DATA3 0x05
+
 /**
 * fire function
 * @param PID player ID  1~127
@@ -28,43 +62,10 @@
 1110 = 75
 1111 = 100
 */
-void ir_send_shot(unsigned char PID, unsigned char TID, unsigned char damage);
+void ir_send_shot(uint8_t player_id, uint8_t team_id, uint8_t damage);
 
-/* send add health message
-@param health 1 ~ 100
-*/
-void ir_send_add_health(unsigned char health);
-
-/* send command
-0x00	Admin Kill
-0x01	Pause/Unpause
-0x02	Start Game
-0x03	Restore Defaults
-0x04	Respawn
-0x05	New Game (Immediate)
-0x06	Full Ammo
-0x07	End Game
-0x08	Reset Clock
-0x09	RESERVED
-0x0A	Initialize Player
-0x0B	Explode Player
-0x0C	New Game (Ready)
-0x0D	Full Health
-0x0E	RESERVED
-0X0F	Full Armor
-0x10	RESERVED
-0x11	RESERVED
-0x12	RESERVED
-0x13	RESERVED
-0x14	Clear Scores
-0x15	Test Sensors
-0x16	Stun Player
-0x17	Disarm Player
-*/
-void ir_send_command(unsigned char command);
-
-/* clone sys*/
-void ir_send_clone(unsigned char* data, int datasize);
+/* send message */
+void ir_send_message(uint8_t byte1, uint8_t byte2, uint8_t *extra, uint8_t ext_len);
 
 /* 
 * handle received message

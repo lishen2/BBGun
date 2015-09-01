@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include "stm32f10x.h"
 #include "public.h"
-#include "usart_io.h"
-#include "button.h"
 #include "led.h"
 #include "ir.h"
-#include "control.h"
+#include "menu.h"
 
 int main()
 {
@@ -20,7 +18,7 @@ int main()
 
 	while(1){
         ir_handle_msg();
-        ctrl_handle_key();
+        menu_handle_key();
 
 		delay_ms(20);
 	}

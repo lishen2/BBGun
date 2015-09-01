@@ -17,7 +17,7 @@ int usartio_sendchar_polling(void* port, unsigned char ch);
 /* 
 * read one character from receive buffer
 */
-int usartio_recvchar(void* port, unsigned char* ch);
+int usartio_recvchar(void* port, unsigned char* ch, int timeout);
 
 /* read data count from receive buffer */
 int usartio_receive_count(void *port);

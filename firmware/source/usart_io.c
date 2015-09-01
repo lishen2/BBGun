@@ -103,7 +103,7 @@ int usartio_sendchar_polling(void* port, unsigned char ch)
     return ERR_OK;
 }
 
-int usartio_recvchar(void *port, unsigned char *ch)
+int usartio_recvchar(void *port, unsigned char *ch, int timeout)
 {
     int ret;
     struct ringbuf_struct *readBuf;
@@ -118,7 +118,13 @@ int usartio_recvchar(void *port, unsigned char *ch)
         return ERR_FAILED;
     }
 
-    ret = ringbuf_getchar(readBuf, ch);
+    timeout += g_jiffies;
+    while (1){
+        ret = ringbuf_getchar(readBuf, ch);
+        if (ERR_OK == ret || time_after(g_jiffies, timeout)){
+            break;
+        }
+    }
 
     return ret;
 }

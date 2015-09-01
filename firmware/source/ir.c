@@ -6,12 +6,25 @@
 #define IR_FIRE_USART   USART3
 #define IR_RECV_UASRT   USART2 
 
+//max wait time when recving system data message
+#define IR_SYSTEM_DATA_RECV_TIMEOUT 3000
+
 //38KHZ PWM pin
 #define IR_PWM_PIN         GPIO_Pin_6
 #define IR_PWM_PORT        GPIOA 
 #define IR_PWM_PORT_CLOCK  RCC_APB2Periph_GPIOA
 #define IR_PWM_TIMER       TIM3
 #define IR_PWM_TIMER_CLOCK RCC_APB1Periph_TIM3
+
+enum{
+    IR_STATE_START,
+    IR_STATE_SHOT,
+    IR_STATE_MESSAGE,
+};
+
+static int g_ir_state;
+static unsigned char g_buf[128];
+static unsigned char g_bufpos;
 
 static void _config_pwm(void)
 {
@@ -79,26 +92,38 @@ void static _gpio_init(void)
 	return;
 }
 
-void ir_init(void)
+static void _ir_handle_system_data(void)
 {
-	_gpio_init();
-	_config_pwm();
-
-    g_ir_state = IR_STATE_START;
+    int i;
+    int ret;
+    uint8_t data;
     
-	return;
+    switch(g_buf[1])
+    {
+    case 0x01:
+        for (i = 0; i < ; ++i){
+            ret = usartio_recvchar(IR_RECV_UASRT, &data, IR_SYSTEM_DATA_RECV_TIMEOUT);
+            if (ERR_OK != ret){
+                break;
+            }
+        }
+        if (sizeof(struct logic_clone_data) == i){
+            logic_clone_data(g_buf + 3);
+        }
+        break;
+    case 0x03:
+        break;
+    case 0x04:
+        break;
+    case 0x05:
+        break;
+    default:
+        break;
+    };
+
+    return;
 }
 
-enum{
-    IR_STATE_START,
-    IR_STATE_SHOT,
-    IR_STATE_MESSAGE,
-    IR_STATE_FINISH,
-};
-
-static int g_ir_state;
-static unsigned char g_buf[128];
-static unsigned char g_bufpos;
 /* 
 * handle received message
 */
@@ -108,83 +133,109 @@ void ir_handle_msg(void)
     int ret;
     
     while(1){
-        ret = usartio_recvchar(IR_RECV_UASRT, &data);
+        ret = usartio_recvchar(IR_RECV_UASRT, &data, 0);
         if (ERR_OK != ret){
             break;
         }
 
+        g_buf[g_bufpos++] = data;
+        
         switch(g_ir_state)
         {
-        case IR_STATE_START:
-        case IR_STATE_FINISH:    
-            g_buf[[0] = data;
-            g_bufpos = 1;
-            if (0 == 0x80 & data){
+        case IR_STATE_START:  
+            if (0 == 0x80 & data) {
                 g_ir_state = IR_STATE_SHOT;
             } else {
                 g_ir_state = IR_STATE_MESSAGE;
             }
             break;
         case IR_STATE_SHOT:
-            g_buf[g_bufpos++] == data;
+            //shot package has only two bytes 
             if (2 == g_bufpos){
-                
+                logic_got_shot(g_buf[0] & 0x7F,
+                                  (g_buf[1] >> 6) & 0x03,
+                                  (g_buf[1] >> 2) & 0x0F);
+
+                g_bufpos = 0;
+                g_ir_state = IR_STATE_START;
             }
             break;
-        }
-    
+        case IR_STATE_MESSAGE:
+            //message package generally has three bytes, expect for 'System Data'
+            if (3 == g_bufpos){
+                switch(g_buf[0]){
+                case 0x80:
+                    logic_add_health(g_buf[1]);
+                    break;
+                case 0x81;
+                    logic_add_rounds(g_buf[1]);
+                    break;
+                case 0x83:
+                    logic_handle_command(g_buf[1]);
+                    break;
+                case 0x87:
+                    _ir_handle_system_data(void);
+                    break;
+                case 0x8A:
+                    logic_clips_pickup(g_buf[1]);
+                    break;
+                case 0x8B:
+                    logic_health_pickup(g_buf[1]);
+                    break;
+                case 0x8C:
+                    logic_flag_pickup(g_buf[1]);
+                    break;
+                default:
+                    break;
+                };
+
+                g_bufpos = 0;
+                g_ir_state = IR_STATE_START;                
+            }
+            break;            
+        };
     }
 
     return;
 }
 
-/*
-void ir_fire(unsigned char team, unsigned char persion, unsigned char damage, unsigned char firetime)
+void ir_init(void)
 {
-    int delay_jif;
+	_gpio_init();
+	_config_pwm();
 
-    delay_jif = firetime/(1000/HZ);
+    memset(g_buf, 0, sizeof(g_buf));
+    g_bufpos = 0;
+    g_ir_state = IR_STATE_START;
 
-	if (time_after(g_last_ts + delay_jif, g_jiffies)){
-		return;
-	}
+	return;
+}
+
+void ir_send_shot(uint8_t player_id, uint8_t team_id, uint8_t damage)
+{
+    uint8_t buf[2];
+
+    buf[0] = player_id & 0x7F;
+    buf[1] = ((team_id & 0x03) << 6) | ((damage & 0x0F) << 2);
+
+	usartio_sendchar_polling(IR_FIRE_USART, buf[0]);
+	usartio_sendchar_polling(IR_FIRE_USART, buf[1]);
+
+    return;
+}
+
+void ir_send_message(uint8_t byte1, uint8_t byte2, uint8_t *extra, uint8_t ext_len)
+{
+    int i;
     
-	usartio_sendchar_polling(IR_FIRE_USART, IR_PROTOCOL_MARK);
-	usartio_sendchar_polling(IR_FIRE_USART, team);
-	usartio_sendchar_polling(IR_FIRE_USART, damage);
-	g_last_ts = firetime;
+    usartio_sendchar_polling(byte1);
+    usartio_sendchar_polling(byte2);
+    usartio_sendchar_polling(0xE8);
+    
+    for (i = 0; i < ext_len; ++i){
+        usartio_sendchar_polling(extra[i]);
+    }
 
-	return;	
+    return;
 }
-
-int ir_ishit(unsigned char *team, unsigned char *persion, unsigned char *damage)
-{
-	unsigned char buf[3];
-	int ret;
-
-	buf[0] = 0;
-
-	if (0 == buf[0] && usartio_receive_count(IR_RECV1_UASRT) >= 3){
-		usartio_recvchar(IR_RECV1_UASRT, buf + 0);
-		usartio_recvchar(IR_RECV1_UASRT, buf + 1);
-		usartio_recvchar(IR_RECV1_UASRT, buf + 2);
-	}
-	
-	if (0 == buf[0] && usartio_receive_count(IR_RECV2_UASRT) >= 3){
-		usartio_recvchar(IR_RECV2_UASRT, buf + 0);
-		usartio_recvchar(IR_RECV2_UASRT, buf + 1);
-		usartio_recvchar(IR_RECV2_UASRT, buf + 2);			
-	}
-
-	if (IR_PROTOCOL_MARK == buf[0]){
-		*team = buf[1];
-		*damage = buf[2];
-		ret = ERR_OK;
-	} else {
-		ret = ERR_FAILED;
-	}
-
-	return ret;
-}
-*/
 
