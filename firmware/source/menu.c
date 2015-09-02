@@ -5,15 +5,16 @@
 static int g_menuTimeout = 0;
 
 /* 界面生成函数 */
-typedef void (*menu_cb_pf)(void);
+typedef void (*menu_cb_pf)(uint32_t);
 struct menu_entry
 {
     char *text;
+    uint32_t data;
     menu_cb_pf cmd_pf;
 };
 
 //根据显示菜单
-static void _display_menu(struct menu_entry* entrys, int entry_count, int timeout)
+static void _display_menu(struct menu_entry* entries, int entry_count, int timeout)
 {
 #define WITHOUT_TITLE_DISPLAY_LINES 4
 
@@ -38,9 +39,9 @@ static void _display_menu(struct menu_entry* entrys, int entry_count, int timeou
         for (n = dis_pos, m = 0; m < WITHOUT_TITLE_DISPLAY_LINES && n < entry_count; ++n, ++m)
         {
             if (0 == select_pos){
-                lcd_display_text(m, 0, LCD_FLAG_INVERSE_COLOR, entrys[n].text);
+                lcd_display_text(m, 0, LCD_FLAG_INVERSE_COLOR, entries[n].text);
             } else {
-                lcd_display_text(m, 0, LCD_FLAG_NORMAL, entrys[n].text);
+                lcd_display_text(m, 0, LCD_FLAG_NORMAL, entries[n].text);
             }
         }
     
@@ -88,7 +89,9 @@ static void _display_menu(struct menu_entry* entrys, int entry_count, int timeou
             }
         }
         else if (BUTTON_ENTER == key){
-            entrys[select_pos].cmd_pf();
+            if (NULL != entries[select_pos].cmd_pf){
+                entries[select_pos].cmd_pf(entries[select_pos].data);
+            }
         }
         else if (BUTTON_CANCEL == key)
         {
@@ -99,32 +102,166 @@ static void _display_menu(struct menu_entry* entrys, int entry_count, int timeou
     return;
 }
 
-void menu_display_main(void)
+static void _display_status(uint32_t unused)
 {
-    struct logic_core_data* data;
+    
+}
 
-    data = logic_get_core_data();
-    lcd_display_text(0, 0, LCD_FLAG_NORMAL, "Team:%hhu Player:%hhu");
+static void _menu_score(uint32_t unused)
+{
 
-    lcd_display_text(1, 0, LCD_FLAG_DOUBLE, "%hhu/%hhu", data->);
+}
+
+static void _handle_game_start(uint32_t unused)
+{
+    int key;
+    
+    lcd_clear_screen();
+    lcd_display_text(0, 0, LCD_FLAG_NORMAL, "Trigger to send");
+    lcd_display_text(1, 0, LCD_FLAG_NORMAL, "  START GAME");
+    lcd_display_text(3, 0, LCD_FLAG_NORMAL, "Cancel to EXIT");
+
+    key = BUTTON_NOKEY;
+    while(BUTTON_CANCEL != key){
+        key = button_get();
+        if (BUTTON_FIRE == key){
+            ir_send_message(IR_BYTE1_COMMAND, IR_BYTE2_COMMAND_START_GAME, NULL, 0);
+        }
+    }
 
     return;
 }
 
-void menu_handle_key(void)
+static void _handle_game_end(uint32_t unused)
 {
     int key;
     
-    key = button_get();
-    if (BUTTON_FIRE == key){
-        logic_on_trigger();
-    } else if (BUTTON_ENTER == key){
-        //enter menu   
-    } else if (BUTTON_RELOAD == key){
-        logic_on_reload();
-    } else if (BUTTON_CANCEL == key){
-        //display info
+    lcd_clear_screen();
+    lcd_display_text(0, 0, LCD_FLAG_NORMAL, "Trigger to send");
+    lcd_display_text(1, 0, LCD_FLAG_NORMAL, "   END GAME");
+    lcd_display_text(3, 0, LCD_FLAG_NORMAL, "Cancel to EXIT");
+
+    key = BUTTON_NOKEY;
+    while(BUTTON_CANCEL != key){
+        key = button_get();
+        if (BUTTON_FIRE == key){
+            ir_send_message(IR_BYTE1_COMMAND, IR_BYTE2_COMMAND_END_GAME, NULL, 0);
+        }
     }
+
+    return;
+}
+
+static void _handle_game_new(uint32_t unused)
+{
+    int key;
+    
+    lcd_clear_screen();
+    lcd_display_text(0, 0, LCD_FLAG_NORMAL, "Trigger to send");
+    lcd_display_text(1, 0, LCD_FLAG_NORMAL, "  NEW GAME");
+    lcd_display_text(3, 0, LCD_FLAG_NORMAL, "Cancel to EXIT");
+
+    key = BUTTON_NOKEY;
+    while(BUTTON_CANCEL != key){
+        key = button_get();
+        if (BUTTON_FIRE == key){
+            ir_send_message(IR_BYTE1_COMMAND, IR_BYTE2_COMMAND_NEW_GAME_IMMED, NULL, 0);
+        }
+    }
+
+    return;    
+}
+
+static void _menu_game(uint32_t unused)
+{
+    struct menu_entry entries[] = {
+        {
+            "Start",
+            0,
+            _handle_game_start,
+        },
+        {
+            "End",
+            0,
+            _handle_game_end,
+        },        
+        {
+            "New",
+            0,
+            _handle_game_new,
+        },        
+    };
+
+    _display_menu(entries, sizeof(entries)/sizeof(struct menu_entry), 30);
+
+    return;
+}
+
+static void _menu_admin(uint32_t unused)
+{
+    struct menu_entry entries[] = {
+        {
+            "Profile",
+            0,
+            NULL,
+        },
+        {
+            "Game",
+            0,
+            _menu_score,
+        },
+    };
+
+    _display_menu(entries, sizeof(entries)/sizeof(struct menu_entry), 30);
+
+    return;
+}
+
+static void _display_version(unint32_t unused)
+{
+
+}
+
+void menu_display_menu(void)
+{
+    struct menu_entry entries[] = {
+        {
+            "Status",
+            0,
+            _display_status,
+        },
+        {
+            "Score",
+            0,
+            _menu_score,
+        },
+        {
+            "Admin"
+            0,
+            _menu_admin,
+        },
+        {
+            "Version"
+            0,
+            _display_version,            
+        }
+    };
+
+    _display_menu(entries, sizeof(entries)/sizeof(struct menu_entry), 30);
+
+    return;
+}
+
+void menu_display_main(void)
+{
+    struct logic_core_data* data;
+    
+    data = logic_get_core_data();
+    lcd_clear_screen();    
+    lcd_display_text(0, 0, LCD_FLAG_DOUBLE, "A:%hhu", data->cur_clip);
+    lcd_display_text(1, 8, LCD_FLAG_NORMAL, "/%hhu",  data->clip_size * data->clips);
+    lcd_display_text(2, 0, LCD_FLAG_DOUBLE, "H:%hhu", data->health);
+    lcd_display_text(3, 8, LCD_FLAG_NORMAL, "/%hhu",  data->armor);
     
     return;
 }

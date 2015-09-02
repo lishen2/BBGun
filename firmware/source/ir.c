@@ -157,7 +157,6 @@ void ir_handle_msg(void)
                 logic_got_shot(g_buf[0] & 0x7F,
                                   (g_buf[1] >> 6) & 0x03,
                                   (g_buf[1] >> 2) & 0x0F);
-
                 g_bufpos = 0;
                 g_ir_state = IR_STATE_START;
             }

@@ -43,21 +43,22 @@ struct logic_core_data
     //persion
     uint8_t team_id;
     uint8_t player_id;
-    uint8_t armor;
+    uint8_t armor;     //armor absorb half of the damage
     uint8_t health;
 
     //gun
-    uint8_t fire_select;
-    uint8_t damage;
+    uint8_t name[8];
+    uint8_t damage;    
     uint8_t clip_size;
     uint8_t clips;
     uint8_t cur_clip;
-    uint8_t reload_delay;
+    uint8_t reload_delay; //delay when doing reload
+    uint8_t shot_delay;   //delay between every shot
 
     //game
     uint8_t respawn_delay;
     uint8_t respawns;
-    uint8_t time_limit;
+    uint8_t time_limit;   //total game limit
 };
 
 //called by ir
@@ -71,9 +72,10 @@ void logic_flag_pickup(uint8_t id);
 void logic_got_shot(uint8_t player_id, uint8_t team_id, uint8_t damage);
 
 //called by menu
-void logic_on_trigger(void);
-void logic_on_reload(void);
-struct logic_core_data* logic_get_core_data(void); 
-    
+struct logic_core_data* logic_get_core_data(void);
+
+//called by main
+void logic_handle_key(void);
+
 #endif
 

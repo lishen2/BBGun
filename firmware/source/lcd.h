@@ -11,4 +11,8 @@ void lcd_display_text(int row, int column, uint8_t flag, char* fmt, ...);
 void lcd_clear_line(int start, int end);
 void lcd_clear_screen(void);
 
+void lcd_shutdown(void);
+void lcd_lightup(void);
+
 #endif
+
