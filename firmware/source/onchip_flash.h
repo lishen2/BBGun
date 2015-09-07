@@ -8,8 +8,8 @@
 #endif
 
 /* ½«ÅäÖÃĞ´ÈëÆ¬ÄÚflash */
-int FLASH_Write(u32 addr, void* buf, int size);
-int FLASH_Erase(u32 addr, u32 size);
+int flash_onchip_write(u32 addr, void* buf, int size);
+int flash_onchip_erase(u32 addr, u32 size);
 
 #endif
 

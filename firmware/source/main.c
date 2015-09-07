@@ -23,7 +23,7 @@ int main()
 	while(1){
 		
         ir_handle_msg();
-        menu_handle_key();
+        logic_handle_key();
 
 		delay_ms(20);
 	}
