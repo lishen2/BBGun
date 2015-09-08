@@ -14,7 +14,7 @@
 #define SND_SAMPLE_IRQ_HANDLER   TIM2_IRQHandler
 
 //sound buf size, sound sample rate is 8KHZ, so 8000 sample store 1 second sound
-#define SND_SAMPLE_SIZE   8000
+#define SND_SAMPLE_SIZE   8192
 
 static uint8_t g_soundBuf[SND_SAMPLE_SIZE];
 static uint32_t g_soundBufPos;

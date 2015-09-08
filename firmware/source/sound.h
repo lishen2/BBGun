@@ -22,5 +22,7 @@ enum {
 void sound_init(void);
 void sound_play(int effect);
 
+void sound_update(int effect, uint8_t *sound);
+
 #endif
 

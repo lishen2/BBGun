@@ -56,8 +56,6 @@ struct logic_core_data
     uint8_t shot_delay;   //delay between every shot
 
     //game
-    uint8_t respawn_delay;
-    uint8_t respawns;
     uint8_t time_limit;   //total game limit
 };
 
